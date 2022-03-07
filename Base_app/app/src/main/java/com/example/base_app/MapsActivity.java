@@ -30,6 +30,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.base_app.databinding.ActivityMapsBinding;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.http.GET;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,LocationListener {
 
     LocationManager locationManager;
@@ -37,6 +46,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ActivityMapsBinding binding;
     private FusedLocationProviderClient fusedLocationClient;
 
+    List<String> NameList = new ArrayList<String>();
+    List<Float> LatList = new ArrayList<Float>();
+    List<Float> LngList = new ArrayList<Float>();
+    Boolean flag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +72,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint("http://webservice.recruit.co.jp/hotpepper/gourmet/v1")
+                .build();
+        HottoApi service = restAdapter.create(HottoApi.class);
+
+        service.getHotto(new Callback<Pepper>() {
+            @Override
+            public void success(Pepper pepper, Response response) {
+                for (Shop s : pepper.getResults().getShop()) {
+                    //Log.d("debug",s.getName());
+                    NameList.add(s.getName());
+                    //Log.d ("debug", "Lat" + String.valueOf(s.getLat()));
+                    //Log.d ("debug", "Lng" + String.valueOf(s.getLng()));
+                    LatList.add(s.getLat());
+                    LngList.add(s.getLng());
+                    flag = true;
+                }
+                LatLng test = new LatLng(26.254, 127.7629);
+                mMap.addMarker(new MarkerOptions().position(test).title("test"));
+                Log.d("debug", String.valueOf(NameList));
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("debug","callback failed");
+                Log.d("debug", String.valueOf(error.getCause()));
+            }
+        });
+
+
     }
 
 
@@ -66,77 +111,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void locationStart(){
         Log.d("debug","locationStart()");
 
-        // LocationManager インスタンス生成
         locationManager =
                 (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        if (locationManager != null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Log.d("debug", "location manager Enabled");
-        } else {
-            // GPSを設定するように促す
-            Intent settingsIntent =
-                    new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(settingsIntent);
-            Log.d("debug", "not gpsEnable, startActivity");
-        }
-
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,}, 1000);
-
-            Log.d("debug", "checkSelfPermission false");
-            return;
-        }
-
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 1000, 50, this);
     }
 
     @Override
-    public void onRequestPermissionsResult(
-            int requestCode, @NonNull String[]permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1000) {
-            // 使用が許可された
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("debug", "checkSelfPermission true");
+    @SuppressLint("MissingPermission")
 
-                locationStart();
-
-            } else {
-                // それでも拒否された時の対応
-                Toast toast = Toast.makeText(this,
-                        "これ以上なにもできません", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        }
-    }
-
-    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        Log.d("Main","debugtesttt");
+        //Log.d("Main","debugtesttt");
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(26.25345333, 127.76638333333334);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng usrlocation = new LatLng(26.25345333, 127.76638333333334);
+        mMap.addMarker(new MarkerOptions().position(usrlocation).title("現在地"));
+
+//        LatLng test = new LatLng(26.254, 127.7629);
+//        mMap.addMarker(new MarkerOptions().position(test).title("test"));
+
+//        Log.d("debug", String.valueOf(NameList));
+//        Log.d("debug", String.valueOf(LatList));
+//        Log.d("debug", String.valueOf(LngList));
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(usrlocation));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+
     }
 
     @Override
-    public void onLocationChanged(@NonNull Location location) {
+    public void onLocationChanged(Location location) {
         // 緯度の表示
-        //TextView textView1 = (TextView) findViewById(R.id.text_view1);
         String str1 = "Latitude:"+location.getLatitude();
-        Log.d("Lat",str1);
-        //textView1.setText(str1);
+        //Log.d("Lat",str1);
 
         // 経度の表示
-        //TextView textView2 = (TextView) findViewById(R.id.text_view2);
         String str2 = "Longtude:"+location.getLongitude();
-        Log.d("Long",str2);
-        //textView2.setText(str2);
+        //Log.d("Long",str2);
     }
-}
+
+
+    }
