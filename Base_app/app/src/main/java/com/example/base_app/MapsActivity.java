@@ -5,12 +5,15 @@ import static com.google.android.gms.maps.GoogleMap.*;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -80,6 +83,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("現在位置から半径1km内にある飲食店を検索します");
+        builder.show();
+
+
 
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint("http://webservice.recruit.co.jp/hotpepper/gourmet/v1")
@@ -146,6 +154,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    public void showDialog(View view) {
+        DialogFragment dialogFragment = new myDialogFragment();
+        dialogFragment.show(getSupportFragmentManager(), "my_dialog");
+    }
 
     @SuppressLint("MissingPermission")
     private void locationStart(){
