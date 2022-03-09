@@ -98,15 +98,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     LngList.add(s.getLng());
 
                 }
-//                int Size = NameList.size();
-//                for (int i=0; i<Size; i ++ ){
-//                    Log.d("debug",NameList.get(i));
-//                    Log.d("debug", String.valueOf(LatList.get(i)));
-//                    Log.d("debug", String.valueOf(LngList.get(i)));
-//
-//                    LatLng test1 = new LatLng(LatList.get(i), LngList.get(i));
-//                    mMap.addMarker(new MarkerOptions().position(test1).title(NameList.get(i)));
-//                }
+                int Size = NameList.size();
+                for (int i=0; i<Size; i ++ ){
+                    Log.d("debug",NameList.get(i));
+                    Log.d("debug", String.valueOf(LatList.get(i)));
+                    Log.d("debug", String.valueOf(LngList.get(i)));
+
+                    LatLng test1 = new LatLng(LatList.get(i), LngList.get(i));
+                    mMap.addMarker(new MarkerOptions().position(test1).title(NameList.get(i)));
+                }
 
                 if (mMap != null){
                     mMap.setInfoWindowAdapter(new InfoWindowAdapter(){
@@ -117,7 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             TextView title = (TextView)view.findViewById(R.id.info_title);
                             title.setText(marker.getTitle());
                             @SuppressLint("WrongViewCast") ImageView img = (ImageView) view.findViewById(R.id.info_img);
-                            img.setImageResource(R.drawable.test);
+                            //img.setImageResource(R.drawable.test);
                             return view;
 
                         }
