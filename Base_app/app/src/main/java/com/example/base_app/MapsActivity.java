@@ -117,7 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             TextView title = (TextView)view.findViewById(R.id.info_title);
                             title.setText(marker.getTitle());
                             @SuppressLint("WrongViewCast") ImageView img = (ImageView) view.findViewById(R.id.info_img);
-                            //img.setImageResource(R.drawable.test);
+                            img.setImageResource(R.drawable.test);
                             return view;
 
                         }
