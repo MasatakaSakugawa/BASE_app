@@ -1,7 +1,10 @@
 package com.example.base_app;
 
+import static com.google.android.gms.maps.GoogleMap.*;
+
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -16,6 +19,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +30,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.base_app.databinding.ActivityMapsBinding;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -91,19 +98,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     LngList.add(s.getLng());
 
                 }
-                int Size = NameList.size();
-                for (int i=0; i<Size; i ++ ){
-                    Log.d("debug",NameList.get(i));
-                    Log.d("debug", String.valueOf(LatList.get(i)));
-                    Log.d("debug", String.valueOf(LngList.get(i)));
+//                int Size = NameList.size();
+//                for (int i=0; i<Size; i ++ ){
+//                    Log.d("debug",NameList.get(i));
+//                    Log.d("debug", String.valueOf(LatList.get(i)));
+//                    Log.d("debug", String.valueOf(LngList.get(i)));
+//
+//                    LatLng test1 = new LatLng(LatList.get(i), LngList.get(i));
+//                    mMap.addMarker(new MarkerOptions().position(test1).title(NameList.get(i)));
+//                }
 
-                    LatLng test1 = new LatLng(LatList.get(i), LngList.get(i));
-                    mMap.addMarker(new MarkerOptions().position(test1).title(NameList.get(i)));
+                if (mMap != null){
+                    mMap.setInfoWindowAdapter(new InfoWindowAdapter(){
+                        @Nullable
+                        @Override
+                        public View getInfoContents(@NonNull Marker marker) {
+                            View view = getLayoutInflater().inflate(R.layout.info_window, null);
+                            TextView title = (TextView)view.findViewById(R.id.info_title);
+                            title.setText(marker.getTitle());
+                            @SuppressLint("WrongViewCast") ImageView img = (ImageView) view.findViewById(R.id.info_img);
+                            img.setImageResource(R.drawable.test);
+                            return view;
+
+                        }
+                        @Nullable
+                        @Override
+                        public View getInfoWindow(@NonNull Marker marker) {
+                            return null;
+                        }
+                    });
                 }
 
+                LatLng test = new LatLng(26.254, 127.7629);
+                Marker marker = mMap.addMarker(new MarkerOptions().position(test).title("test"));
+                //marker.showInfoWindow();
 
-                //LatLng test = new LatLng(26.254, 127.7629);
-                //mMap.addMarker(new MarkerOptions().position(test).title("test"));
+                mMap.addMarker(new MarkerOptions().position(test).title("test"));
             }
 
             @Override
@@ -134,15 +164,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         //Log.d("Main","debugtesttt");
 
+//        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+//              @Override
+//              public View getInfoWindow(Marker marker) {
+//                  return null;    //どちらかに処理を記述
+//              }
+//          });
+
         LatLng usrlocation = new LatLng(26.25345333, 127.76638333333334);
-        mMap.addMarker(new MarkerOptions().position(usrlocation).title("現在地"));
+        mMap.addMarker(new MarkerOptions().position(usrlocation).title("現在地").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        Marker marker = mMap.addMarker(new MarkerOptions().position(usrlocation).title("現在地").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        marker.showInfoWindow();
 
-//        LatLng test = new LatLng(26.254, 127.7629);
-//        mMap.addMarker(new MarkerOptions().position(test).title("test"));
-
-//        Log.d("debug", String.valueOf(NameList));
-//        Log.d("debug", String.valueOf(LatList));
-//        Log.d("debug", String.valueOf(LngList));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(usrlocation));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
