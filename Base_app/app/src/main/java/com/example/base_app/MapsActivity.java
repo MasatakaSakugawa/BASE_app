@@ -89,11 +89,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     //Log.d ("debug", "Lng" + String.valueOf(s.getLng()));
                     LatList.add(s.getLat());
                     LngList.add(s.getLng());
-                    flag = true;
+
                 }
-                LatLng test = new LatLng(26.254, 127.7629);
-                mMap.addMarker(new MarkerOptions().position(test).title("test"));
-                Log.d("debug", String.valueOf(NameList));
+                int Size = NameList.size();
+                for (int i=0; i<Size; i ++ ){
+                    Log.d("debug",NameList.get(i));
+                    Log.d("debug", String.valueOf(LatList.get(i)));
+                    Log.d("debug", String.valueOf(LngList.get(i)));
+
+                    LatLng test1 = new LatLng(LatList.get(i), LngList.get(i));
+                    mMap.addMarker(new MarkerOptions().position(test1).title(NameList.get(i)));
+                }
+
+
+                //LatLng test = new LatLng(26.254, 127.7629);
+                //mMap.addMarker(new MarkerOptions().position(test).title("test"));
             }
 
             @Override
